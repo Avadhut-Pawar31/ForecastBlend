@@ -1,51 +1,120 @@
 .alerts-card {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
-.alerts-card.empty {
-  justify-content: center;
+.alerts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.no-alerts {
+.alerts-title-icon {
+  color: #D97706;
+}
+
+.alerts-filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(241, 245, 249, 0.9);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.filter-tab {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.no-alerts-state {
+  padding: 32px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  color: #64748B;
-  padding: 32px 0;
+  gap: 8px;
+  text-align: center;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px dashed rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
 }
 
-.success-icon {
-  color: var(--color-success);
+.all-clear-icon {
+  color: #059669;
+}
+
+.no-alerts-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.no-alerts-desc {
+  font-size: 0.78rem;
+  color: #64748B;
 }
 
 .alerts-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-height: 300px;
+  gap: 12px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
 .alert-item {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border-left: 4px solid transparent;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
 }
 
-.severity-watch { border-left-color: var(--color-watch); }
-.severity-watch .alert-icon-col { color: var(--color-watch); }
+.alert-item.severity-severe {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: linear-gradient(145deg, rgba(254, 226, 226, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
 
-.severity-warning { border-left-color: var(--color-warning); background: #FFF7ED; }
-.severity-warning .alert-icon-col { color: var(--color-warning); }
+.alert-item.severity-warning {
+  border-color: rgba(249, 115, 22, 0.4);
+  background: linear-gradient(145deg, rgba(254, 243, 199, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
 
-.severity-severe { border-left-color: var(--color-severe); background: #FEF2F2; }
-.severity-severe .alert-icon-col { color: var(--color-severe); }
+.alert-item.severity-watch {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(145deg, rgba(254, 243, 199, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.alert-severity-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.severity-severe .alert-severity-badge { background: rgba(239, 68, 68, 0.15); color: #DC2626; }
+.severity-warning .alert-severity-badge { background: rgba(249, 115, 22, 0.15); color: #EA580C; }
+.severity-watch .alert-severity-badge { background: rgba(245, 158, 11, 0.15); color: #D97706; }
 
 .alert-content {
   flex: 1;
@@ -54,27 +123,51 @@
   gap: 4px;
 }
 
-.alert-header {
+.alert-meta-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: baseline;
+}
+
+.alert-region {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0F172A;
 }
 
 .alert-time {
-  font-size: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: #64748B;
 }
 
 .alert-msg {
-  font-size: 14px;
-  color: var(--text-main);
-  margin: 4px 0;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .alert-footer {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-size: 12px;
-  color: #64748B;
-  text-transform: capitalize;
+  margin-top: 6px;
+}
+
+.alert-type-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #475569;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.alert-conf-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
 }

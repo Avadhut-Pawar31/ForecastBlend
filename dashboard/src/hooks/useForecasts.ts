@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { RegionCode, LeadHours, LatestBlendedForecast, WeightMapEntry, ExtremeAlert, BacktestResult, PipelineExecution } from '../types';
 import { fetchForecast, fetchWeights, fetchAlerts, fetchBacktest, triggerPipeline } from '../api/client';
 
-export function useForecasts(region: RegionCode, leadHours: LeadHours) {
+export function useForecasts(region: RegionCode, _leadHours: LeadHours) {
   const [forecast, setForecast] = useState<LatestBlendedForecast | null>(null);
   const [weights, setWeights] = useState<WeightMapEntry[]>([]);
   const [alerts, setAlerts] = useState<ExtremeAlert[]>([]);

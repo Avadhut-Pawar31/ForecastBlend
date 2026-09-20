@@ -32,7 +32,8 @@ router.get('/weights/:region', (req, res) => {
 });
 
 router.get('/alerts', (req, res) => {
-    res.json(store.getAlerts());
+    const region = req.query.region as RegionCode | undefined;
+    res.json(store.getAlerts(region));
 });
 
 router.get('/alerts/:region', (req, res) => {

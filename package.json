@@ -1,0 +1,12 @@
+{
+  "name": "forecast-blend-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix server run dev",
+    "dev:server": "npm --prefix server run dev",
+    "dev:dashboard": "npm --prefix dashboard run dev",
+    "start": "npm --prefix server run start",
+    "build:server": "npm --prefix server run build",
+    "build:dashboard": "npm --prefix dashboard run build"
+  }
+}

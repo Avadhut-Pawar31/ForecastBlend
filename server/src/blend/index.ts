@@ -77,6 +77,7 @@ export function runBlendPipeline(forecasts: ForecastRaw[], observations: Observa
                 const key = `${region}|${lead}|${variable}`;
                 if (blendedResults[key]) {
                     const targetTime = new Date(maxDate + lead * 60 * 60 * 1000).toISOString();
+                    forecastData[variable][lead.toString()] = blendedResults[key];
                     forecastData[variable][targetTime] = blendedResults[key];
                 }
             }

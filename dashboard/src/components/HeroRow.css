@@ -4,92 +4,203 @@
   gap: 16px;
 }
 
-.hero-row-loading {
-  height: 200px;
+.hero-top-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: #64748B;
+  justify-content: space-between;
+}
+
+.hero-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clock-icon {
+  color: #2563EB;
 }
 
 .lead-time-toggle {
   display: flex;
-  gap: 8px;
+  background: rgba(241, 245, 249, 0.9);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(203, 213, 225, 0.8);
 }
 
 .lead-btn {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-main);
-  transition: all 0.2s;
+  color: #475569;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.lead-btn:hover {
+  color: #0F172A;
 }
 
 .lead-btn.active {
-  background: var(--primary-blue);
-  color: white;
-  border-color: var(--primary-blue);
+  background: #2563EB;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 20px;
+}
+
+@media (max-width: 1200px) {
+  .hero-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-row-loading {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748B;
+}
+
+.skeleton-loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(37, 99, 235, 0.2);
+  border-top-color: #2563EB;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .extreme-status-card {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
+  justify-content: space-between;
+}
+
+.extreme-status-card.normal {
+  background: linear-gradient(145deg, rgba(236, 253, 245, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .extreme-status-card.extreme {
-  border-color: var(--color-warning);
-  background: #FFFBEB;
+  background: linear-gradient(145deg, rgba(254, 226, 226, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
-.extreme-status-card h3 {
-  font-size: 16px;
-  color: #64748B;
-}
-
-.status-indicator {
+.status-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 24px;
+  justify-content: space-between;
+}
+
+.status-title {
+  font-size: 0.92rem;
   font-weight: 700;
+  color: #0F172A;
+}
+
+.shield-icon { color: #059669; }
+.alert-icon-pulse { color: #DC2626; animation: pulseAlert 1.5s infinite; }
+
+@keyframes pulseAlert {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.status-card-body {
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.status-indicator-badge.all-clear {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-indicator-badge.active-alert {
+  background: rgba(239, 68, 68, 0.15);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .pulse-dot {
-  width: 16px;
-  height: 16px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--color-success);
 }
 
-.extreme .pulse-dot {
-  background: var(--color-warning);
+.all-clear .pulse-dot {
+  background: #059669;
+  box-shadow: 0 0 8px #059669;
 }
 
-.pulse-dot.pulsing {
-  animation: pulse 2s infinite;
+.active-alert .pulse-dot {
+  background: #DC2626;
+  box-shadow: 0 0 8px #DC2626;
+  animation: pulseDot 1s infinite alternate;
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+@keyframes pulseDot {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
 }
 
-@media (max-width: 1024px) {
-  .hero-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.status-label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.status-desc {
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.status-card-footer {
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  padding-top: 10px;
+}
+
+.regime-tag {
+  font-size: 0.72rem;
+  color: #334155;
+  font-weight: 600;
 }

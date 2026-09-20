@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BacktestResult, VARIABLE_LABELS } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { TrendingDown, Award } from 'lucide-react';
 import './SkillChart.css';
 
 interface Props {
@@ -34,36 +35,87 @@ export default function SkillChart({ backtest }: Props) {
     }
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-chart-tooltip">
+          <p className="ct-label">{label} (MAE)</p>
+          <div className="ct-list">
+            {payload.map((entry: any, idx: number) => (
+              <div key={idx} className="ct-item">
+                <span className="ct-dot" style={{ backgroundColor: entry.color }} />
+                <span className="ct-name">{entry.name}:</span>
+                <span className="ct-val">{entry.value.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="card skill-chart-card">
       <div className="skill-chart-header">
-        <h2 className="panel-title">Model Skill Comparison — Blended vs Individual</h2>
+        <div className="skill-title-group">
+          <h2 className="panel-title">
+            <TrendingDown size={18} className="skill-title-icon" />
+            Model Skill Comparison — Blended vs Individual Sources
+          </h2>
+          <span className="skill-subtitle">Mean Absolute Error (MAE) benchmarking across forecast horizons</span>
+        </div>
+
         <div className="skill-controls">
-          <span className="skill-badge">+23% improvement vs best single model</span>
-          <select value={leadTime} onChange={e => setLeadTime(Number(e.target.value))} className="skill-select">
-            <option value={24}>24h Lead</option>
-            <option value={48}>48h Lead</option>
-            <option value={72}>72h Lead</option>
-            <option value={96}>96h Lead</option>
-          </select>
+          <div className="skill-badge">
+            <Award size={13} />
+            <span>+23% MAE Reduction vs Best Single Model</span>
+          </div>
+
+          <div className="lead-select-wrapper">
+            <select 
+              value={leadTime} 
+              onChange={e => setLeadTime(Number(e.target.value))} 
+              className="skill-select"
+            >
+              <option value={24}>+24h Horizon</option>
+              <option value={48}>+48h Horizon</option>
+              <option value={72}>+72h Horizon</option>
+              <option value={96}>+96h Horizon</option>
+            </select>
+          </div>
         </div>
       </div>
       
       <div className="chart-container">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} />
-            <YAxis label={{ value: 'MAE (Lower is better)', angle: -90, position: 'insideLeft', fill: '#64748B' }} axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} />
-            <Tooltip cursor={{ fill: '#F5F6F8' }} />
-            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+            <defs>
+              <linearGradient id="blendedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#3B82F6" stopOpacity={1}/>
+                <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.8}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-secondary)', fontSize: 13 }} />
+            <YAxis 
+              label={{ value: 'MAE (Lower is Better)', angle: -90, position: 'insideLeft', fill: 'var(--text-muted)', fontSize: 12 }} 
+              axisLine={false} 
+              tickLine={false} 
+              tick={{ fill: 'var(--text-muted)', fontSize: 12 }} 
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              wrapperStyle={{ paddingTop: '16px' }}
+              formatter={(value) => <span style={{ color: 'var(--text-secondary)', fontSize: 12, fontWeight: 500 }}>{value}</span>}
+            />
             {sources.map(s => (
               <Bar 
                 key={s} 
                 dataKey={s} 
-                name={s.replace('NWP_', '').replace('AI_', '')} 
-                fill={getSourceColor(s)} 
-                radius={[4, 4, 0, 0]}
+                name={s === 'BLENDED' ? 'BLENDED (Optimal)' : s.replace('NWP_', '').replace('AI_', '')} 
+                fill={s === 'BLENDED' ? 'url(#blendedGrad)' : getSourceColor(s)} 
+                radius={[6, 6, 0, 0]}
                 barSize={s === 'BLENDED' ? 32 : 24}
               />
             ))}

@@ -1,21 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F5F6F8;
-  --text-main: #111318;
-  --primary-blue: #1D4ED8;
+  /* Ultra-Translucent Glassmorphic Light Palette */
+  --bg-main: #E2E8F0;
+  --card-bg: rgba(255, 255, 255, 0.45);
+  --card-bg-hover: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(255, 255, 255, 0.75);
+  --card-border-hover: rgba(37, 99, 235, 0.4);
   
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  
+  /* Primary Accent & Glows */
+  --primary-blue: #2563EB;
+  --primary-glow: rgba(37, 99, 235, 0.25);
+  --accent-cyan: #0284C7;
+  --accent-indigo: #4F46E5;
+  --accent-emerald: #059669;
+  
+  /* Forecast Model Palette */
   --color-gfs: #64748B;
-  --color-ecmwf: #0D9488;
-  --color-graphcast: #4F46E5;
-  --color-blended: #1D4ED8;
+  --color-ecmwf: #0284C7;
+  --color-graphcast: #6366F1;
+  --color-blended: #2563EB;
   
+  /* Alert Severities */
   --color-watch: #D97706;
   --color-warning: #EA580C;
   --color-severe: #DC2626;
-  --color-success: #16A34A;
+  --color-success: #059669;
 
-  --border-color: #E5E7EB;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --border-color: rgba(255, 255, 255, 0.6);
+  --shadow-sm: 0 15px 35px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  --shadow-glow: 0 20px 45px rgba(37, 99, 235, 0.15), inset 0 1px 1px rgba(255, 255, 255, 1);
 }
 
 * {
@@ -26,22 +44,74 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--text-main);
-  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  background-color: var(--bg-main);
+  background-image: url('./assets/light_sky_background.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .card {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--card-bg);
+  backdrop-filter: blur(32px) saturate(210%);
+  -webkit-backdrop-filter: blur(32px) saturate(210%);
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
   box-shadow: var(--shadow-sm);
   padding: 24px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--card-border-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.panel-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 button {
   cursor: pointer;
   font-family: inherit;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
 }

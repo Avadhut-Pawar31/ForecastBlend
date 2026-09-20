@@ -1,41 +1,121 @@
 .skill-chart-card {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .skill-chart-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.skill-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skill-title-icon {
+  color: var(--accent-indigo);
+}
+
+.skill-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
 .skill-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .skill-badge {
-  background: #DCFCE7;
-  color: var(--color-success);
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--accent-emerald);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
 .skill-select {
-  padding: 6px 12px;
-  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.5);
   border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text-main);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
   outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .skill-select {
+  background: #FFFFFF;
+}
+
+.skill-select:hover {
+  border-color: var(--card-border-hover);
 }
 
 .chart-container {
   width: 100%;
+  padding-top: 8px;
+}
+
+.custom-chart-tooltip {
+  background: var(--card-bg-hover);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border-hover);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.ct-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.ct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ct-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.ct-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ct-name {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.ct-val {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
 }

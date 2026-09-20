@@ -4,6 +4,11 @@ import { RegionCode } from '../types';
 
 const router = Router();
 
+router.get('/skill/:region', (req, res) => {
+    const region = req.params.region as RegionCode;
+    res.json(store.getSkillHistory(region));
+});
+
 router.get('/skill-history/:region', (req, res) => {
     const region = req.params.region as RegionCode;
     res.json(store.getSkillHistory(region));
@@ -21,6 +26,11 @@ router.get('/models', (req, res) => {
     ]);
 });
 
+router.post('/pipeline/trigger', (req, res) => {
+    const result = store.runPipeline();
+    res.json(result);
+});
+
 router.post('/pipeline/run', (req, res) => {
     const result = store.runPipeline();
     res.json(result);
@@ -28,8 +38,18 @@ router.post('/pipeline/run', (req, res) => {
 
 router.get('/pipeline/status/:id', (req, res) => {
     res.json({
-        status: 'completed',
-        stages: ['skill_score', 'weight_calc', 'blend', 'extreme_detect']
+        executionId: req.params.id,
+        status: 'SUCCEEDED',
+        startedAt: new Date().toISOString(),
+        stages: [
+            { name: 'Ingest Model Outputs', status: 'SUCCEEDED' },
+            { name: 'Normalize & Validate', status: 'SUCCEEDED' },
+            { name: 'Compute Skill Scores', status: 'SUCCEEDED' },
+            { name: 'Invoke Blend Weight Model', status: 'SUCCEEDED' },
+            { name: 'Compute Blended Forecast', status: 'SUCCEEDED' },
+            { name: 'Detect Extreme Conditions', status: 'SUCCEEDED' },
+            { name: 'Run Backtest', status: 'SUCCEEDED' },
+        ]
     });
 });
 
