@@ -1,54 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Restrained Dark Navy Meteorological Theme */
-  --bg-app: #0B1120;
-  --bg-surface-1: #0F172A;
-  --bg-surface-2: #1E293B;
-  --bg-surface-3: #273549;
-  --bg-surface-hover: #334155;
+  /* Crisp Modern Daylight & Frosted Glass Palette */
+  --bg-gradient: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 30%, #F8FAFC 70%, #EDE9FE 100%);
+  --bg-app: #F8FAFC;
+  --bg-surface-glass: rgba(255, 255, 255, 0.78);
+  --bg-surface-glass-hover: rgba(255, 255, 255, 0.92);
+  --bg-surface-glass-active: #FFFFFF;
+  --bg-surface-card: rgba(255, 255, 255, 0.85);
+  --bg-surface-card-hover: #FFFFFF;
+  --bg-surface-subtle: rgba(241, 245, 249, 0.75);
+  --bg-surface-1: rgba(255, 255, 255, 0.90);
+  --bg-surface-2: #F1F5F9;
+  --bg-surface-3: #E2E8F0;
   
-  --border-subtle: #1E293B;
-  --border-default: #334155;
-  --border-strong: #475569;
+  --border-glass: rgba(226, 232, 240, 0.85);
+  --border-glass-subtle: rgba(226, 232, 240, 0.5);
+  --border-glass-strong: #CBD5E1;
+  --border-default: #E2E8F0;
   
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  --text-dim: #64748B;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-dim: #94A3B8;
   
-  /* Meteorological Visualization Accents */
-  --accent-cyan: #38BDF8;      /* Primary meteorological cyan (GFS / Rain) */
-  --accent-cyan-dim: rgba(56, 189, 248, 0.12);
-  --accent-emerald: #34D399;   /* Skill / ECMWF / Normalcy */
-  --accent-emerald-dim: rgba(52, 211, 153, 0.12);
-  --accent-amber: #F59E0B;     /* Blended output / Watch alert */
-  --accent-amber-dim: rgba(245, 158, 11, 0.12);
-  --accent-indigo: #818CF8;    /* AI GraphCast */
-  --accent-indigo-dim: rgba(129, 140, 248, 0.12);
-  --accent-rose: #F87171;      /* Extreme / Warning */
-  --accent-rose-dim: rgba(248, 113, 113, 0.12);
+  /* Luminous Meteorological Accents for Light Theme */
+  --accent-gold: #F59E0B;      /* Warm golden sun & active selections */
+  --accent-gold-hover: #D97706;
+  --accent-gold-bg: rgba(245, 158, 11, 0.12);
+  --accent-gold-dim: rgba(245, 158, 11, 0.12);
+  --accent-cyan: #0284C7;      /* GFS / Rain curves / Primary data */
+  --accent-cyan-bg: rgba(2, 132, 199, 0.10);
+  --accent-cyan-dim: rgba(2, 132, 199, 0.12);
+  --accent-teal: #059669;      /* ECMWF / Positive skill */
+  --accent-teal-bg: rgba(5, 150, 105, 0.10);
+  --accent-teal-dim: rgba(5, 150, 105, 0.12);
+  --accent-indigo: #7C3AED;    /* GraphCast AI / Purple accent */
+  --accent-indigo-bg: rgba(124, 58, 237, 0.10);
+  --accent-indigo-dim: rgba(124, 58, 237, 0.12);
+  --accent-red: #DC2626;       /* Weather alerts */
+  --accent-red-bg: rgba(220, 38, 38, 0.10);
   
-  /* Model-specific Colors */
-  --color-gfs: #38BDF8;
-  --color-ecmwf: #34D399;
-  --color-graphcast: #818CF8;
+  /* Model Identity Colors */
+  --color-gfs: #0284C7;
+  --color-ecmwf: #059669;
+  --color-graphcast: #7C3AED;
   --color-blended: #F59E0B;
   
-  /* Status & Severity Colors */
-  --color-watch: #F59E0B;
-  --color-warning: #F97316;
-  --color-severe: #EF4444;
-  --color-normal: #10B981;
-  
   /* Shadows & Elevation */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+  --shadow-glow-gold: 0 4px 16px 0 rgba(245, 158, 11, 0.25);
   
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-card: 22px;
+  --radius-pill: 9999px;
 }
 
 * {
@@ -59,49 +68,36 @@
 
 html, body {
   background-color: var(--bg-app);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', 'Inter', sans-serif;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
+#root {
+  min-height: 100vh;
 }
 
-code, pre, .font-mono {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-  border: none;
-  background: none;
-  transition: all 0.15s ease-in-out;
-}
-
-/* Custom Scrollbar for dark theme */
+/* Custom Scrollbar for Light Theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-surface-1);
+  background: rgba(241, 245, 249, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: var(--radius-sm);
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-strong);
+  background: rgba(100, 116, 139, 0.6);
 }

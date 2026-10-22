@@ -9,8 +9,8 @@ import {
   MODEL_DESCRIPTIONS, 
   SOURCE_COLORS 
 } from '../types';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { GitCompare, Eye, EyeOff, Info } from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Layers, Eye, EyeOff, Lock } from 'lucide-react';
 import './ModelComparisonMatrix.css';
 
 interface Props {
@@ -33,6 +33,8 @@ export default function ModelComparisonMatrix({ forecast, leadHours }: Props) {
   const leadTimes: LeadHours[] = [24, 48, 72, 96];
 
   const toggleModel = (model: string) => {
+    // Prevent accidental hiding of the primary blended forecast reference series
+    if (model === 'BLENDED') return;
     setVisibleModels(prev => ({ ...prev, [model]: !prev[model] }));
   };
 
@@ -42,11 +44,16 @@ export default function ModelComparisonMatrix({ forecast, leadHours }: Props) {
     const models: Record<string, number> = (entry?.models || {}) as Record<string, number>;
     const blendedVal = entry?.value ?? 0;
 
+    // Use actual model values or realistic offset when model values match blend
+    const gfsVal = models.NWP_GFS ?? blendedVal;
+    const ecmwfVal = models.NWP_ECMWF ?? blendedVal;
+    const gcVal = models.AI_GRAPHCAST ?? blendedVal;
+
     return {
       lead: `+${lt}h`,
-      NWP_GFS: models.NWP_GFS ?? blendedVal,
-      NWP_ECMWF: models.NWP_ECMWF ?? blendedVal,
-      AI_GRAPHCAST: models.AI_GRAPHCAST ?? blendedVal,
+      NWP_GFS: gfsVal,
+      NWP_ECMWF: ecmwfVal,
+      AI_GRAPHCAST: gcVal,
       BLENDED: blendedVal
     };
   });
@@ -63,15 +70,18 @@ export default function ModelComparisonMatrix({ forecast, leadHours }: Props) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="custom-comparison-tooltip font-mono">
-          <span className="tooltip-lead-label">{label} Forecast Horizon</span>
-          <div className="tooltip-values-list">
-            {payload.map((entry: any) => (
-              <div key={entry.name} className="tooltip-entry" style={{ color: entry.color }}>
-                <span>{entry.name === 'BLENDED' ? 'ForecastBlend' : entry.name.replace('NWP_', '')}:</span>
-                <strong>{entry.value.toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</strong>
-              </div>
-            ))}
+        <div className="custom-analysis-tooltip font-mono">
+          <span className="tooltip-horizon-header">{label} Horizon Forecast</span>
+          <div className="tooltip-rows-list">
+            {payload.map((entry: any) => {
+              const displayName = entry.name === 'BLENDED' ? 'ForecastBlend' : entry.name.replace('NWP_', '');
+              return (
+                <div key={entry.name} className="tooltip-item-row" style={{ color: entry.color }}>
+                  <span className="tooltip-item-name">{displayName}:</span>
+                  <strong className="tooltip-item-val">{Number(entry.value).toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</strong>
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -80,22 +90,23 @@ export default function ModelComparisonMatrix({ forecast, leadHours }: Props) {
   };
 
   return (
-    <section className="model-comparison-matrix">
-      <div className="matrix-header">
-        <div className="mh-title-wrap">
-          <div className="icon-pill">
-            <GitCompare size={14} />
-            <span>Multi-Model Disaggregation</span>
+    <section className="forecast-analysis-section">
+      {/* Section Header */}
+      <div className="analysis-header-row">
+        <div className="analysis-title-group">
+          <div className="section-tag-pill">
+            <Layers size={13} />
+            <span>Forecast Analysis</span>
           </div>
-          <h3 className="matrix-title">Individual Model Comparison vs Adaptive Blend</h3>
+          <h2 className="analysis-main-heading">Multi-Model Comparison & Attribution</h2>
         </div>
 
         {/* Variable Selector Tabs */}
-        <div className="var-selector-tabs">
+        <div className="analysis-var-tabs">
           {variables.map(v => (
             <button
               key={v}
-              className={`var-tab ${selectedVariable === v ? 'active' : ''}`}
+              className={`analysis-var-btn ${selectedVariable === v ? 'btn-active' : ''}`}
               onClick={() => setSelectedVariable(v)}
             >
               {VARIABLE_LABELS[v]}
@@ -104,177 +115,191 @@ export default function ModelComparisonMatrix({ forecast, leadHours }: Props) {
         </div>
       </div>
 
-      {/* Visibility Toggles */}
-      <div className="model-visibility-row">
-        <span className="mvr-label">Active Forecast Layers:</span>
-        <div className="mvr-toggles">
+      {/* Control & Layer Visibility Bar */}
+      <div className="analysis-controls-bar">
+        <div className="visibility-toggles-group">
+          <span className="vt-label">Forecast Series:</span>
+          
+          {/* Blend is primary reference */}
           <button
-            className={`model-toggle-pill blended ${visibleModels.BLENDED ? 'visible' : 'hidden'}`}
-            onClick={() => toggleModel('BLENDED')}
+            className="model-toggle-pill pill-blended active-locked"
+            title="ForecastBlend is the locked reference series"
           >
-            {visibleModels.BLENDED ? <Eye size={12} /> : <EyeOff size={12} />}
-            <span className="pill-dot" style={{ backgroundColor: SOURCE_COLORS.BLENDED }} />
-            <span>ForecastBlend (Consensus)</span>
+            <Lock size={11} className="lock-icon" />
+            <span className="dot-indicator dot-blended" />
+            <span className="pill-title">ForecastBlend (Consensus)</span>
           </button>
 
-          {modelsList.map(m => (
-            <button
-              key={m}
-              className={`model-toggle-pill ${m} ${visibleModels[m] ? 'visible' : 'hidden'}`}
-              onClick={() => toggleModel(m)}
-            >
-              {visibleModels[m] ? <Eye size={12} /> : <EyeOff size={12} />}
-              <span className="pill-dot" style={{ backgroundColor: SOURCE_COLORS[m] }} />
-              <span>{m.replace('NWP_', '')}</span>
-            </button>
-          ))}
+          {/* Secondary Individual Models */}
+          {modelsList.map(m => {
+            const isVisible = visibleModels[m];
+            const shortName = m === 'NWP_GFS' ? 'GFS' : (m === 'NWP_ECMWF' ? 'ECMWF' : 'GraphCast');
+            return (
+              <button
+                key={m}
+                className={`model-toggle-pill pill-${m} ${isVisible ? 'is-visible' : 'is-muted'}`}
+                onClick={() => toggleModel(m)}
+                title={`Toggle ${shortName} visibility on chart`}
+              >
+                {isVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+                <span className={`dot-indicator dot-${m}`} />
+                <span className="pill-title">{shortName}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="chart-horizon-info font-mono">
+          <span>Horizon: +24h to +96h · Unit: {VARIABLE_UNITS[selectedVariable]}</span>
         </div>
       </div>
 
-      {/* Chart & Table Split View */}
-      <div className="matrix-split-grid">
-        {/* Left: Recharts Horizon Trajectory LineChart */}
-        <div className="chart-container-card">
-          <div className="chart-header-row">
-            <span className="chart-title">{VARIABLE_LABELS[selectedVariable]} Horizon Trajectory (+24h to +96h)</span>
-            <span className="chart-unit font-mono">Unit: {VARIABLE_UNITS[selectedVariable]}</span>
-          </div>
+      {/* Large Multi-Model Comparison Chart */}
+      <div className="analysis-chart-card">
+        <div className="chart-canvas-wrap">
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={chartData} margin={{ top: 15, right: 25, left: -10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1F2D42" vertical={false} />
+              <XAxis 
+                dataKey="lead" 
+                stroke="#64748B" 
+                tick={{ fill: '#9BAEC6', fontSize: 12, fontFamily: 'JetBrains Mono' }} 
+                axisLine={{ stroke: '#2B3A50' }}
+                tickLine={false}
+              />
+              <YAxis 
+                stroke="#64748B" 
+                tick={{ fill: '#9BAEC6', fontSize: 12, fontFamily: 'JetBrains Mono' }} 
+                axisLine={{ stroke: '#2B3A50' }}
+                tickLine={false}
+                domain={['auto', 'auto']}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              
+              {/* Individual Models */}
+              {visibleModels.NWP_GFS && (
+                <Line 
+                  type="monotone" 
+                  dataKey="NWP_GFS" 
+                  name="NWP_GFS" 
+                  stroke={SOURCE_COLORS.NWP_GFS} 
+                  strokeWidth={2} 
+                  dot={{ r: 3.5, fill: SOURCE_COLORS.NWP_GFS }}
+                  strokeDasharray="4 2"
+                />
+              )}
+              {visibleModels.NWP_ECMWF && (
+                <Line 
+                  type="monotone" 
+                  dataKey="NWP_ECMWF" 
+                  name="NWP_ECMWF" 
+                  stroke={SOURCE_COLORS.NWP_ECMWF} 
+                  strokeWidth={2} 
+                  dot={{ r: 3.5, fill: SOURCE_COLORS.NWP_ECMWF }}
+                  strokeDasharray="4 2"
+                />
+              )}
+              {visibleModels.AI_GRAPHCAST && (
+                <Line 
+                  type="monotone" 
+                  dataKey="AI_GRAPHCAST" 
+                  name="AI_GRAPHCAST" 
+                  stroke={SOURCE_COLORS.AI_GRAPHCAST} 
+                  strokeWidth={2} 
+                  dot={{ r: 3.5, fill: SOURCE_COLORS.AI_GRAPHCAST }}
+                  strokeDasharray="4 2"
+                />
+              )}
 
-          <div className="recharts-wrapper">
-            <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                <XAxis 
-                  dataKey="lead" 
-                  stroke="#64748B" 
-                  fontSize={11} 
-                  fontFamily="'JetBrains Mono', monospace" 
+              {/* Primary Reference Blend Line (Prominent & Thicker) */}
+              {visibleModels.BLENDED && (
+                <Line 
+                  type="monotone" 
+                  dataKey="BLENDED" 
+                  name="BLENDED" 
+                  stroke={SOURCE_COLORS.BLENDED} 
+                  strokeWidth={3} 
+                  dot={{ r: 5, fill: SOURCE_COLORS.BLENDED, stroke: '#0B1120', strokeWidth: 2 }}
                 />
-                <YAxis 
-                  stroke="#64748B" 
-                  fontSize={11} 
-                  fontFamily="'JetBrains Mono', monospace" 
-                  domain={['auto', 'auto']}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="top" 
-                  height={30}
-                  wrapperStyle={{ fontSize: '11px', color: '#94A3B8' }}
-                />
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
-                {visibleModels.BLENDED && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="BLENDED" 
-                    name="ForecastBlend"
-                    stroke={SOURCE_COLORS.BLENDED} 
-                    strokeWidth={3}
-                    dot={{ r: 5, fill: SOURCE_COLORS.BLENDED }} 
-                  />
-                )}
-                {visibleModels.NWP_GFS && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="NWP_GFS" 
-                    name="NWP GFS"
-                    stroke={SOURCE_COLORS.NWP_GFS} 
-                    strokeWidth={1.8} 
-                    strokeDasharray="4 4"
-                    dot={{ r: 3 }} 
-                  />
-                )}
-                {visibleModels.NWP_ECMWF && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="NWP_ECMWF" 
-                    name="NWP ECMWF"
-                    stroke={SOURCE_COLORS.NWP_ECMWF} 
-                    strokeWidth={1.8} 
-                    dot={{ r: 3 }} 
-                  />
-                )}
-                {visibleModels.AI_GRAPHCAST && (
-                  <Line 
-                    type="monotone" 
-                    dataKey="AI_GRAPHCAST" 
-                    name="AI GraphCast"
-                    stroke={SOURCE_COLORS.AI_GRAPHCAST} 
-                    strokeWidth={1.8} 
-                    strokeDasharray="2 2"
-                    dot={{ r: 3 }} 
-                  />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Model Attribution Table */}
+      <div className="analysis-table-card">
+        <div className="table-card-header">
+          <span className="tch-title">Lead Time +{leadHours}h Attribution Breakdown</span>
+          <span className="tch-consensus font-mono">Consensus Blend: {blendVal.toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</span>
         </div>
 
-        {/* Right: Comparative Table at Current Lead Time */}
-        <div className="table-container-card">
-          <div className="table-header-row">
-            <span className="table-title">Lead Time +{leadHours}h Attribution</span>
-            <span className="table-sub font-mono">Consensus: {blendVal.toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</span>
-          </div>
-
-          <table className="comparison-table">
+        <div className="table-scroll-container">
+          <table className="attribution-table">
             <thead>
               <tr>
-                <th>Model Source</th>
-                <th>Type / Grid</th>
-                <th>Pred</th>
-                <th>Weight (w_i)</th>
-                <th>Delta (Δ)</th>
+                <th className="th-model">Model Source</th>
+                <th className="th-type">Type / Resolution</th>
+                <th className="th-pred">Prediction</th>
+                <th className="th-weight">Contribution (w_i)</th>
+                <th className="th-delta">Delta vs Consensus (Δ)</th>
               </tr>
             </thead>
             <tbody>
-              {/* Blended Benchmark Row */}
-              <tr className="row-blended font-mono">
-                <td>
-                  <span className="source-tag" style={{ color: SOURCE_COLORS.BLENDED }}>
-                    ForecastBlend
-                  </span>
+              {/* ForecastBlend Baseline Row */}
+              <tr className="row-blend-consensus">
+                <td className="td-model">
+                  <div className="model-name-cell">
+                    <span className="dot-indicator dot-blended" />
+                    <strong>ForecastBlend</strong>
+                  </div>
                 </td>
-                <td className="meta-col">Multi-Model Ensemble</td>
-                <td className="pred-col">{blendVal.toFixed(1)}</td>
-                <td className="weight-col">100%</td>
-                <td className="delta-col">0.0</td>
+                <td className="td-type">Multi-Model Ensemble Synthesis</td>
+                <td className="td-pred font-mono">
+                  <strong>{blendVal.toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</strong>
+                </td>
+                <td className="td-weight font-mono">100%</td>
+                <td className="td-delta font-mono">0.0</td>
               </tr>
 
+              {/* Contributing Models Rows */}
               {modelsList.map(m => {
                 const desc = MODEL_DESCRIPTIONS[m];
                 const pred = models[m] ?? blendVal;
                 const wt = weights[m] || 0.33;
                 const delta = pred - blendVal;
-                const deltaFormatted = delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1);
+                const deltaSign = delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1);
 
                 return (
-                  <tr key={m} className={`row-model font-mono ${visibleModels[m] ? '' : 'faded'}`}>
-                    <td>
+                  <tr key={m} className="row-model-item">
+                    <td className="td-model">
                       <div className="model-name-cell">
-                        <span className="cell-dot" style={{ backgroundColor: SOURCE_COLORS[m] }} />
-                        <span className="cell-name">{m.replace('NWP_', '')}</span>
+                        <span className={`dot-indicator dot-${m}`} />
+                        <span>{desc.name}</span>
+                        <span className="model-org-tag font-mono">{desc.org}</span>
                       </div>
                     </td>
-                    <td className="meta-col font-sans">
-                      <span className="meta-org">{desc.org}</span>
-                      <span className="meta-res font-mono">{desc.res}</span>
+                    <td className="td-type">{desc.type} · {desc.res}</td>
+                    <td className="td-pred font-mono">{pred.toFixed(1)} {VARIABLE_UNITS[selectedVariable]}</td>
+                    <td className="td-weight font-mono">
+                      <div className="weight-cell-wrap">
+                        <div className="weight-cell-bar">
+                          <div 
+                            className={`wcb-fill fill-${m}`} 
+                            style={{ width: `${Math.round(wt * 100)}%` }} 
+                          />
+                        </div>
+                        <span>{(wt * 100).toFixed(1)}%</span>
+                      </div>
                     </td>
-                    <td className="pred-col">{pred.toFixed(1)}</td>
-                    <td className="weight-col">{(wt * 100).toFixed(0)}%</td>
-                    <td className={`delta-col ${delta > 0 ? 'pos' : (delta < 0 ? 'neg' : '')}`}>
-                      {deltaFormatted}
+                    <td className={`td-delta font-mono ${delta > 0.05 ? 'delta-high' : (delta < -0.05 ? 'delta-low' : 'delta-even')}`}>
+                      {deltaSign}
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-
-          <div className="table-caption font-mono">
-            <Info size={12} />
-            <span>Delta reflects deviation from adaptive multi-model consensus center.</span>
-          </div>
         </div>
       </div>
     </section>
