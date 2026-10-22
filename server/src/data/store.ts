@@ -1,7 +1,22 @@
 import fs from 'fs';
 import path from 'path';
-import { ForecastRaw, ObservationTruth, RegionCode, ModelSource, Variable, LatestBlendedForecast, WeightMapEntry, ExtremeAlert, SkillScore, BacktestResult } from '../types';
+import { 
+  ForecastRaw, 
+  ObservationTruth, 
+  RegionCode, 
+  ModelSource, 
+  Variable, 
+  LatestBlendedForecast, 
+  WeightMapEntry, 
+  ExtremeAlert, 
+  SkillScore, 
+  BacktestResult,
+  WeatherInsight,
+  LocationMetadata,
+  REGIONS_METADATA 
+} from '../types';
 import { runBlendPipeline } from '../blend/index';
+import { generateWeatherInsights } from '../blend/insights-generator';
 import { generateData, generateDataInMemory } from './generator';
 
 class Store {
@@ -62,8 +77,53 @@ class Store {
     return this.skillHistory.filter(s => s.region_code === region);
   }
 
-  getBacktestResults() {
+  getBacktestResults(region?: RegionCode) {
+    if (region) return this.backtestResults.filter(b => b.region_code === region);
     return this.backtestResults;
+  }
+
+  getWeatherInsights(region: RegionCode): WeatherInsight[] {
+    const f = this.getLatestBlended(region);
+    if (!f) return [];
+    return generateWeatherInsights(f);
+  }
+
+  getLocationMetadata(region: RegionCode): LocationMetadata {
+    return REGIONS_METADATA[region];
+  }
+
+  getAllLocations(): LocationMetadata[] {
+    return Object.values(REGIONS_METADATA);
+  }
+
+  getVerificationSummary(region: RegionCode) {
+    const regionResults = this.getBacktestResults(region);
+    const variables: Variable[] = ['rainfall_mm', 'temp_c', 'wind_kmh'];
+    const reductionMap: Record<string, number> = {};
+
+    variables.forEach(v => {
+      const vResults = regionResults.filter(r => r.variable === v);
+      const blendedRes = vResults.filter(r => r.source_label === 'BLENDED');
+      const individualRes = vResults.filter(r => r.source_label !== 'BLENDED');
+
+      if (blendedRes.length && individualRes.length) {
+        const meanBlendedMae = blendedRes.reduce((s, r) => s + r.mae, 0) / blendedRes.length;
+        const meanIndivMae = individualRes.reduce((s, r) => s + r.mae, 0) / individualRes.length;
+        const reductionPct = meanIndivMae > 0 ? ((meanIndivMae - meanBlendedMae) / meanIndivMae) * 100 : 0;
+        reductionMap[v] = Number(reductionPct.toFixed(1));
+      } else {
+        reductionMap[v] = 0;
+      }
+    });
+
+    return {
+      region,
+      location: REGIONS_METADATA[region],
+      evalWindow: 'Trailing 14-day rolling window',
+      totalEvaluations: regionResults.length,
+      averageErrorReductionPct: reductionMap,
+      results: regionResults
+    };
   }
 
   runPipeline() {

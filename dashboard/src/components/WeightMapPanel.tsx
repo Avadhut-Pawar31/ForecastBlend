@@ -1,5 +1,5 @@
 import { WeightMapEntry, LeadHours } from '../types';
-import { Sliders, Cpu, Cloud, Brain } from 'lucide-react';
+import { Sliders, Cpu, Cloud, Brain, Info } from 'lucide-react';
 import './WeightMapPanel.css';
 
 interface Props {
@@ -21,11 +21,11 @@ export default function WeightMapPanel({ weights, leadHours }: Props) {
   return (
     <div className="card weight-panel">
       <div className="panel-header-row">
-        <h2 className="panel-title">
-          <Sliders size={18} className="title-icon" />
-          Model Weight Distribution (Inverse-MAE Softmax)
-        </h2>
-        <span className="formula-badge">w_i = (1/MAE_i) / Σ(1/MAE_j)</span>
+        <div className="phr-left">
+          <Sliders size={16} className="title-icon" />
+          <h3 className="panel-title">Adaptive Weight Distribution by Horizon</h3>
+        </div>
+        <span className="formula-badge font-mono">w_i ∝ 1/(MAE_i + ε)</span>
       </div>
 
       <div className="weight-legend-grid">
@@ -34,53 +34,68 @@ export default function WeightMapPanel({ weights, leadHours }: Props) {
           const rawWt = activeEntry?.weights?.[s.key as keyof typeof activeEntry.weights] ?? 0.33;
           const val = (rawWt * 100).toFixed(0);
           return (
-            <div key={s.key} className="legend-card" style={{ borderColor: `${s.color}30` }}>
+            <div key={s.key} className="legend-card" style={{ borderColor: `${s.color}35` }}>
               <div className="legend-top">
                 <span className="legend-dot" style={{ backgroundColor: s.color }} />
                 <span className="legend-name">{s.label}</span>
-                <Icon size={14} className="legend-icon" style={{ color: s.color }} />
+                <Icon size={13} className="legend-icon" style={{ color: s.color }} />
               </div>
-              <div className="legend-bottom">
+              <div className="legend-bottom font-mono">
                 <span className="legend-wt-val" style={{ color: s.color }}>{val}%</span>
-                <span className="legend-sub">weight at +{leadHours}h</span>
+                <span className="legend-sub">at +{leadHours}h</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="weight-bars-container">
+      <div className="weight-bars-container font-mono">
         {leadTimes.map(lt => {
           const entry = safeWeights.find(w => w.lead_hours === lt);
           if (!entry) return null;
           const isSelected = lt === leadHours;
 
+          const gfs = (entry.weights?.NWP_GFS ?? 0.33) * 100;
+          const ecmwf = (entry.weights?.NWP_ECMWF ?? 0.33) * 100;
+          const graphcast = (entry.weights?.AI_GRAPHCAST ?? 0.34) * 100;
+
           return (
             <div key={lt} className={`weight-row ${isSelected ? 'active' : ''}`}>
               <div className="wr-lead-col">
-                <span className="wr-lead-pill">+{lt}h</span>
+                <span className="wr-lead-tag">+{lt}h</span>
               </div>
+
               <div className="wr-bar-track">
-                {sources.map(s => {
-                  const rawWt = entry.weights?.[s.key as keyof typeof entry.weights] ?? 0.33;
-                  const val = rawWt * 100;
-                  return (
-                    <div 
-                      key={s.key} 
-                      className="wr-segment"
-                      style={{ width: `${val}%`, backgroundColor: s.color }}
-                      title={`${s.label}: ${val.toFixed(1)}%`}
-                    >
-                      {val >= 16 && (
-                        <span className="segment-label">{val.toFixed(0)}%</span>
-                      )}
-                    </div>
-                  );
-                })}
+                <div 
+                  className="wr-bar-fill gfs" 
+                  style={{ width: `${gfs}%` }}
+                  title={`GFS: ${gfs.toFixed(1)}%`}
+                />
+                <div 
+                  className="wr-bar-fill ecmwf" 
+                  style={{ width: `${ecmwf}%` }}
+                  title={`ECMWF: ${ecmwf.toFixed(1)}%`}
+                />
+                <div 
+                  className="wr-bar-fill graphcast" 
+                  style={{ width: `${graphcast}%` }}
+                  title={`GraphCast: ${graphcast.toFixed(1)}%`}
+                />
+              </div>
+
+              <div className="wr-values-col">
+                <span className="wv-gfs" style={{ color: 'var(--color-gfs)' }}>{gfs.toFixed(0)}%</span>
+                <span className="wv-ecmwf" style={{ color: 'var(--color-ecmwf)' }}>{ecmwf.toFixed(0)}%</span>
+                <span className="wv-graphcast" style={{ color: 'var(--color-graphcast)' }}>{graphcast.toFixed(0)}%</span>
               </div>
             </div>
           );
         })}
+      </div>
+
+      <div className="wp-footer font-mono">
+        <Info size={12} />
+        <span>GraphCast weights dominant at +24h; ECMWF and GFS gain weight at +72h to +96h.</span>
       </div>
     </div>
   );
