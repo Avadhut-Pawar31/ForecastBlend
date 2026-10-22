@@ -27,7 +27,7 @@ const VARIABLES: Variable[] = ['rainfall_mm', 'temp_c', 'wind_kmh'];
 const MODELS: ModelSource[] = ['NWP_GFS', 'NWP_ECMWF', 'AI_GRAPHCAST'];
 const REGIMES: WeatherRegime[] = ['convective', 'monsoon_synoptic', 'clear', 'western_disturbance'];
 
-function generateData() {
+export function generateDataInMemory(): { forecasts: ForecastRaw[]; observations: ObservationTruth[] } {
   const forecasts: ForecastRaw[] = [];
   const observations: ObservationTruth[] = [];
   
@@ -129,18 +129,26 @@ function generateData() {
     }
   }
 
-  const outDir = path.join(__dirname, '../../generated-data');
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
+  return { forecasts, observations };
+}
 
-  fs.writeFileSync(path.join(outDir, 'forecast_raw.json'), JSON.stringify(forecasts, null, 2));
-  fs.writeFileSync(path.join(outDir, 'observation_truth.json'), JSON.stringify(observations, null, 2));
-  console.log('Data generation complete.');
+export function generateData() {
+  const data = generateDataInMemory();
+  try {
+    const outDir = path.join(__dirname, '../../generated-data');
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
+    }
+
+    fs.writeFileSync(path.join(outDir, 'forecast_raw.json'), JSON.stringify(data.forecasts, null, 2));
+    fs.writeFileSync(path.join(outDir, 'observation_truth.json'), JSON.stringify(data.observations, null, 2));
+    console.log('Data generation complete.');
+  } catch (err) {
+    console.warn('Could not write generated data to disk (running in read-only environment):', err);
+  }
+  return data;
 }
 
 if (require.main === module) {
   generateData();
 }
-
-export { generateData };

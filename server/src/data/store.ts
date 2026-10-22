@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { ForecastRaw, ObservationTruth, RegionCode, ModelSource, Variable, LatestBlendedForecast, WeightMapEntry, ExtremeAlert, SkillScore, BacktestResult } from '../types';
 import { runBlendPipeline } from '../blend/index';
-import { generateData } from './generator';
+import { generateData, generateDataInMemory } from './generator';
 
 class Store {
   forecasts: ForecastRaw[] = [];
@@ -15,12 +15,19 @@ class Store {
   backtestResults: BacktestResult[] = [];
 
   load() {
-    const outDir = path.join(__dirname, '../../generated-data');
-    if (!fs.existsSync(path.join(outDir, 'forecast_raw.json'))) {
-      generateData();
+    try {
+      const outDir = path.join(__dirname, '../../generated-data');
+      if (fs.existsSync(path.join(outDir, 'forecast_raw.json')) && fs.existsSync(path.join(outDir, 'observation_truth.json'))) {
+        this.forecasts = JSON.parse(fs.readFileSync(path.join(outDir, 'forecast_raw.json'), 'utf8'));
+        this.observations = JSON.parse(fs.readFileSync(path.join(outDir, 'observation_truth.json'), 'utf8'));
+        return;
+      }
+    } catch {
+      // Filesystem access not available or read-only, proceed with memory generator
     }
-    this.forecasts = JSON.parse(fs.readFileSync(path.join(outDir, 'forecast_raw.json'), 'utf8'));
-    this.observations = JSON.parse(fs.readFileSync(path.join(outDir, 'observation_truth.json'), 'utf8'));
+    const data = generateDataInMemory();
+    this.forecasts = data.forecasts;
+    this.observations = data.observations;
   }
 
   getForecasts(region?: RegionCode, source?: ModelSource, variable?: Variable) {

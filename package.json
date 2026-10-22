@@ -1,12 +1,29 @@
 {
   "name": "forecast-blend-root",
   "private": true,
+  "workspaces": [
+    "dashboard",
+    "server"
+  ],
   "scripts": {
-    "dev": "npm --prefix server run dev",
+    "dev": "npm --prefix dashboard run dev",
     "dev:server": "npm --prefix server run dev",
     "dev:dashboard": "npm --prefix dashboard run dev",
-    "start": "npm --prefix server run start",
+    "start": "node server/dist/index.js",
+    "start:server": "npm --prefix server run start",
+    "build": "npm --prefix dashboard run build && npm --prefix server run build && node -e \"const fs=require('fs'); if(fs.existsSync('dashboard/dist')){fs.cpSync('dashboard/dist','dist',{recursive:true})}\"",
+    "build:dashboard": "npm --prefix dashboard run build",
     "build:server": "npm --prefix server run build",
-    "build:dashboard": "npm --prefix dashboard run build"
+    "test": "npm --prefix server run test"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.3"
   }
 }

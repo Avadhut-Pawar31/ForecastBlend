@@ -8,7 +8,7 @@ import {
   PipelineExecution
 } from '../types';
 
-const BASE_URL = 'http://localhost:3001/api/v1';
+const BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api/v1';
 
 async function fetchWithMockFallback<T>(url: string, mockData: T): Promise<T> {
   try {
