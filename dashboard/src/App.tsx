@@ -12,7 +12,6 @@ import WeatherInsightsPanel from './components/WeatherInsightsPanel';
 import AlertsStream from './components/AlertsStream';
 import PipelineConsole from './components/PipelineConsole';
 
-import { CloudSun, LineChart, ShieldCheck, Map, Terminal, X } from 'lucide-react';
 import './App.css';
 
 type ActiveView = 'overview' | 'analysis' | 'verification' | 'map' | 'insights';
@@ -102,14 +101,6 @@ export default function App() {
         {/* View 2: Multi-Model Forecast Analysis */}
         {activeView === 'analysis' && (
           <div className="view-fade-in sub-view-wrap">
-            <div className="view-header-row">
-              <span className="view-back-btn" onClick={() => setActiveView('overview')}>
-                ← Back to Weather Overview
-              </span>
-              <button className="view-close-icon" onClick={() => setActiveView('overview')}>
-                <X size={16} />
-              </button>
-            </div>
             <ModelComparisonMatrix 
               forecast={forecast}
               leadHours={leadHours}
@@ -120,14 +111,6 @@ export default function App() {
         {/* View 3: Empirical Verification Lab */}
         {activeView === 'verification' && (
           <div className="view-fade-in sub-view-wrap">
-            <div className="view-header-row">
-              <span className="view-back-btn" onClick={() => setActiveView('overview')}>
-                ← Back to Weather Overview
-              </span>
-              <button className="view-close-icon" onClick={() => setActiveView('overview')}>
-                <X size={16} />
-              </button>
-            </div>
             <VerificationLab 
               backtest={backtest}
               verificationSummary={verification}
@@ -139,14 +122,6 @@ export default function App() {
         {/* View 4: Synoptic Station Map & Weights */}
         {activeView === 'map' && (
           <div className="view-fade-in sub-view-wrap">
-            <div className="view-header-row">
-              <span className="view-back-btn" onClick={() => setActiveView('overview')}>
-                ← Back to Weather Overview
-              </span>
-              <button className="view-close-icon" onClick={() => setActiveView('overview')}>
-                <X size={16} />
-              </button>
-            </div>
             <div className="two-column-analytics-grid">
               <RegionMap 
                 selectedRegion={region}
@@ -165,14 +140,6 @@ export default function App() {
         {/* View 5: Automated Insights & Alerts */}
         {activeView === 'insights' && (
           <div className="view-fade-in sub-view-wrap">
-            <div className="view-header-row">
-              <span className="view-back-btn" onClick={() => setActiveView('overview')}>
-                ← Back to Weather Overview
-              </span>
-              <button className="view-close-icon" onClick={() => setActiveView('overview')}>
-                <X size={16} />
-              </button>
-            </div>
             <div className="two-column-analytics-grid">
               <WeatherInsightsPanel 
                 insights={insights}
@@ -185,56 +152,6 @@ export default function App() {
           </div>
         )}
       </main>
-
-      {/* 3. Floating Bottom Navigation Pill (Like the reference mobile app bottom bar) */}
-      <nav className="floating-bottom-nav">
-        <div className="bottom-nav-pill">
-          <button
-            className={`b-nav-item ${activeView === 'overview' ? 'nav-active' : ''}`}
-            onClick={() => setActiveView('overview')}
-            title="Weather Forecast Overview"
-          >
-            <CloudSun size={18} />
-            <span className="b-nav-label">Weather</span>
-          </button>
-
-          <button
-            className={`b-nav-item ${activeView === 'analysis' ? 'nav-active' : ''}`}
-            onClick={() => setActiveView('analysis')}
-            title="Multi-Model Trajectories & Comparison"
-          >
-            <LineChart size={18} />
-            <span className="b-nav-label">Analysis</span>
-          </button>
-
-          <button
-            className={`b-nav-item ${activeView === 'verification' ? 'nav-active' : ''}`}
-            onClick={() => setActiveView('verification')}
-            title="Historical Accuracy & Verification Lab"
-          >
-            <ShieldCheck size={18} />
-            <span className="b-nav-label">Verification</span>
-          </button>
-
-          <button
-            className={`b-nav-item ${activeView === 'map' ? 'nav-active' : ''}`}
-            onClick={() => setActiveView('map')}
-            title="Maharashtra Synoptic Station Network"
-          >
-            <Map size={18} />
-            <span className="b-nav-label">Stations</span>
-          </button>
-
-          <button
-            className={`b-nav-item ${showConsole ? 'nav-active' : ''}`}
-            onClick={() => setShowConsole(prev => !prev)}
-            title="Inspect Pipeline Execution Console"
-          >
-            <Terminal size={18} />
-            <span className="b-nav-label">Pipeline</span>
-          </button>
-        </div>
-      </nav>
     </div>
   );
 }

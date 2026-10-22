@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RegionCode, REGION_NAMES, ExtremeAlert, LatestBlendedForecast } from '../types';
 import MaharashtraOutline from '../assets/maharashtra';
-import { MapPin, AlertTriangle, CloudSun, Compass } from 'lucide-react';
+import { MapPin, AlertTriangle, Radio } from 'lucide-react';
 import './RegionMap.css';
 
 interface Props {
@@ -18,22 +18,30 @@ export default function RegionMap({ selectedRegion, onSelectRegion, alerts, fore
 
   const getMarkerColor = (code: RegionCode) => {
     const regionAlerts = safeAlerts.filter(a => a?.region_code === code);
-    if (regionAlerts.some(a => a?.severity === 'severe')) return 'var(--color-severe)';
-    if (regionAlerts.some(a => a?.severity === 'warning')) return 'var(--color-warning)';
-    if (regionAlerts.some(a => a?.severity === 'watch')) return 'var(--color-watch)';
-    return 'var(--accent-cyan)';
+    if (regionAlerts.some(a => a?.severity === 'severe')) return '#EF4444';
+    if (regionAlerts.some(a => a?.severity === 'warning')) return '#F59E0B';
+    if (regionAlerts.some(a => a?.severity === 'watch')) return '#3B82F6';
+    return '#0284C7';
   };
 
   const getAlertCount = (code: RegionCode) => {
     return safeAlerts.filter(a => a?.region_code === code).length;
   };
 
-  // Coordinates on Maharashtra SVG canvas
+  // Clearly separated coordinates on Maharashtra SVG canvas
   const regions: { code: RegionCode; x: number; y: number }[] = [
-    { code: 'MUM', x: 210, y: 320 },
-    { code: 'PUN', x: 270, y: 390 },
-    { code: 'NGP', x: 620, y: 260 },
+    { code: 'MUM', x: 195, y: 340 },
+    { code: 'PUN', x: 285, y: 430 },
+    { code: 'NGP', x: 630, y: 240 },
   ];
+
+  const activeObsTemp = selectedRegion === 'PUN' 
+    ? (forecast?.current_observation ? `${forecast.current_observation.temp_c.toFixed(1)}°C` : '28.4°C')
+    : (selectedRegion === 'MUM' ? '30.1°C' : '34.2°C');
+
+  const activeObsRain = selectedRegion === 'PUN' 
+    ? (forecast?.current_observation ? `${forecast.current_observation.rainfall_mm.toFixed(1)} mm` : '0.0 mm')
+    : (selectedRegion === 'MUM' ? '14.2 mm' : '0.0 mm');
 
   return (
     <div className="card region-map-card">
@@ -55,14 +63,6 @@ export default function RegionMap({ selectedRegion, onSelectRegion, alerts, fore
           const color = getMarkerColor(r.code);
           const regionName = REGION_NAMES[r.code] || r.code;
 
-          // Dynamic observation / forecast values
-          const curTemp = r.code === selectedRegion && forecast?.current_observation 
-            ? `${forecast.current_observation.temp_c.toFixed(1)}°C` 
-            : (r.code === 'NGP' ? '34.2°C' : (r.code === 'MUM' ? '30.1°C' : '28.4°C'));
-          const curRain = r.code === selectedRegion && forecast?.current_observation 
-            ? `${forecast.current_observation.rainfall_mm.toFixed(1)} mm` 
-            : (r.code === 'MUM' ? '14.2 mm' : '0.0 mm');
-
           return (
             <div 
               key={r.code}
@@ -76,11 +76,11 @@ export default function RegionMap({ selectedRegion, onSelectRegion, alerts, fore
               onMouseLeave={() => setHoveredRegion(null)}
             >
               <div className="marker-pin" style={{ backgroundColor: color }}>
-                <span className="ping-ring" style={{ borderColor: color }} />
+                {isSelected && <span className="ping-ring" style={{ borderColor: color }} />}
                 <span className="pin-center" />
               </div>
 
-              <div className="marker-label-badge font-mono">
+              <div className={`marker-label-badge font-mono ${isSelected ? 'badge-selected' : ''}`}>
                 <span className="marker-name">{regionName}</span>
                 {alertCount > 0 && (
                   <span className="alert-count-pill" style={{ backgroundColor: color }}>
@@ -89,23 +89,10 @@ export default function RegionMap({ selectedRegion, onSelectRegion, alerts, fore
                 )}
               </div>
 
-              {(isHovered || isSelected) && (
-                <div className="map-tooltip-card font-mono">
-                  <div className="tooltip-header">
-                    <CloudSun size={13} className="tt-icon" />
-                    <strong>{regionName} Station ({r.code})</strong>
-                  </div>
-                  <div className="tooltip-stats">
-                    <div className="tt-stat">
-                      <span className="tt-lbl">Temp:</span>
-                      <span className="tt-val">{curTemp}</span>
-                    </div>
-                    <div className="tt-stat">
-                      <span className="tt-lbl">Precip:</span>
-                      <span className="tt-val">{curRain}</span>
-                    </div>
-                  </div>
-                  <div className="tooltip-action">Click to inspect forecast</div>
+              {/* Hover-only lightweight badge */}
+              {isHovered && !isSelected && (
+                <div className="map-hover-pill font-mono">
+                  <span>Click to select {regionName}</span>
                 </div>
               )}
             </div>
@@ -113,9 +100,32 @@ export default function RegionMap({ selectedRegion, onSelectRegion, alerts, fore
         })}
       </div>
 
-      <div className="map-footer-caption font-mono">
-        <Compass size={12} />
-        <span>In-situ Indian Automated Weather Station (AWS) Network Grid</span>
+      {/* Selected Station Strip: Replaces messy overlapping popup */}
+      <div className="selected-station-strip">
+        <div className="sss-left">
+          <div className="sss-dot-wrap">
+            <Radio size={14} className="sss-radio-icon" />
+          </div>
+          <div className="sss-info">
+            <span className="sss-name">{REGION_NAMES[selectedRegion]} Synoptic Station ({selectedRegion})</span>
+            <span className="sss-sub font-mono">In Situ Automated Weather Station (AWS) Network</span>
+          </div>
+        </div>
+
+        <div className="sss-metrics font-mono">
+          <div className="sss-chip">
+            <span className="sss-lbl">Temp:</span>
+            <strong>{activeObsTemp}</strong>
+          </div>
+          <div className="sss-chip">
+            <span className="sss-lbl">Precip:</span>
+            <strong>{activeObsRain}</strong>
+          </div>
+          <div className="sss-chip status-live">
+            <span className="live-dot" />
+            <span>LIVE</span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ export default function WeightMapPanel({ weights, leadHours }: Props) {
           <Sliders size={16} className="title-icon" />
           <h3 className="panel-title">Adaptive Weight Distribution by Horizon</h3>
         </div>
-        <span className="formula-badge font-mono">w_i ∝ 1/(MAE_i + ε)</span>
+        <span className="formula-badge font-mono">Inverse-Variance Weighted</span>
       </div>
 
       <div className="weight-legend-grid">

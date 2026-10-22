@@ -80,39 +80,42 @@ export default function HeaderNav({
         {/* Right: Operational Status & Controls */}
         <div className="nav-actions">
           {/* Real System Health Indicator */}
-          <div className={`health-status-badge ${hasError ? 'status-error' : (pipelineRunning ? 'status-running' : 'status-healthy')}`}>
+          <div 
+            className={`health-status-badge ${hasError ? 'status-error' : (pipelineRunning ? 'status-running' : 'status-healthy')}`}
+            title={hasError ? "Serving in-situ backup fixtures" : "Operational: Multi-Model Consensus (GFS, ECMWF, GraphCast)"}
+          >
             {hasError ? (
               <>
-                <AlertCircle size={12} className="status-icon" />
-                <span className="status-text">Degraded · Backup Mode</span>
+                <AlertCircle size={13} className="status-icon" />
+                <span className="status-text">Backup Mode</span>
               </>
             ) : pipelineRunning ? (
               <>
                 <span className="pulse-dot running" />
-                <span className="status-text">Pipeline Executing</span>
+                <span className="status-text">Executing</span>
               </>
             ) : (
               <>
-                <CheckCircle2 size={12} className="status-icon" />
-                <span className="status-text">Operational · Multi-Model Consensus</span>
+                <CheckCircle2 size={13} className="status-icon" />
+                <span className="status-text">Operational</span>
               </>
             )}
           </div>
 
           {/* Data Freshness Timestamp */}
-          <div className="timestamp-badge font-mono" title="Latest Ingestion Cycle Timestamp">
+          <div className="timestamp-badge font-mono" title={`Latest Cycle Ingested: ${formattedUpdate}`}>
             <Activity size={12} className="meta-icon" />
-            <span>Updated: {formattedUpdate}</span>
+            <span>{formattedUpdate}</span>
           </div>
 
-          {/* Action Buttons with Consistent Sizing */}
+          {/* Action Buttons */}
           <button 
             className="action-btn"
             onClick={onOpenPipelineModal}
             title="Inspect Data Pipeline and Model Ingestion Stages"
           >
             <Terminal size={13} />
-            <span>Pipeline Console</span>
+            <span>Pipeline</span>
           </button>
 
           <button 
